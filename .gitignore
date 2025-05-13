@@ -1,0 +1,4 @@
+# Ignore large files
+backend/faiss_index/faiss.index
+backend/models/Xenova/all-MiniLM-L6-v2/onnx/model.onnx
+backend/embeddings.json
