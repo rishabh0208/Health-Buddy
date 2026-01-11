@@ -40,32 +40,35 @@ app.use(express.json());
 
 const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-//get chat history by chatId
-app.get("/chats/:chatId", async (req, res) => {
-  try {
-    const chat = await Chat.findById(req.params.chatId)
-      .select("name convo createdAt")
-      .lean();
 
-    if (!chat) {
-      return res.status(404).json({ error: "Chat not found" });
-    }
+app.use("/chats", chatRoutes);
 
-    // Transform the convo array for better frontend consumption
-    const transformedChat = {
-      ...chat,
-      convo: chat.convo.map((msg) => ({
-        sender: msg.sender,
-        message: msg.message,
-        createdAt: msg.createdAt,
-      })),
-    };
+// //get chat history by chatId
+// app.get("/chats/:chatId", async (req, res) => {
+//   try {
+//     const chat = await Chat.findById(req.params.chatId)
+//       .select("name convo createdAt")
+//       .lean();
 
-    res.json(transformedChat);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch chat history" });
-  }
-});
+//     if (!chat) {
+//       return res.status(404).json({ error: "Chat not found" });
+//     }
+
+//     // Transform the convo array for better frontend consumption
+//     const transformedChat = {
+//       ...chat,
+//       convo: chat.convo.map((msg) => ({
+//         sender: msg.sender,
+//         message: msg.message,
+//         createdAt: msg.createdAt,
+//       })),
+//     };
+
+//     res.json(transformedChat);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch chat history" });
+//   }
+// });
 
 // login 
 app.post("/login", async (req, res) => {
@@ -117,23 +120,23 @@ app.post("/users", async (req, res) => {
 });
 
 
-// Get chats by userId
-app.get("/chats/user/:userId", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+// // Get chats by userId
+// app.get("/chats/user/:userId", async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.userId);
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    const chats = await Chat.find({ email: user.email })
-      .sort({ "convo.createdAt": -1 })
-      .select("name _id");
+//     const chats = await Chat.find({ email: user.email })
+//       .sort({ "convo.createdAt": -1 })
+//       .select("name _id");
 
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch chat history" });
-  }
-});
+//     res.json(chats);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch chat history" });
+//   }
+// });
 
 // Get symptoms for a user with optional time filter
 app.get("/users/:userId/symptoms", async (req, res) => {
@@ -234,24 +237,24 @@ app.get("/users/:userId/health-summary", async (req, res) => {
   }
 });
 
-// delete chat by chatId
-app.delete("/chats/:chatId", async (req, res) => {
-  try {
-    const { chatId } = req.params;
+// // delete chat by chatId
+// app.delete("/chats/:chatId", async (req, res) => {
+//   try {
+//     const { chatId } = req.params;
 
-    // Find and delete the chat
-    const result = await Chat.findByIdAndDelete(chatId);
+//     // Find and delete the chat
+//     const result = await Chat.findByIdAndDelete(chatId);
 
-    if (!result) {
-      return res.status(404).json({ error: "Chat not found" });
-    }
+//     if (!result) {
+//       return res.status(404).json({ error: "Chat not found" });
+//     }
 
-    res.status(200).json({ message: "Chat deleted successfully" });
-  } catch (error) {
-    console.error("Delete chat error:", error);
-    res.status(500).json({ error: "Failed to delete chat" });
-  }
-});
+//     res.status(200).json({ message: "Chat deleted successfully" });
+//   } catch (error) {
+//     console.error("Delete chat error:", error);
+//     res.status(500).json({ error: "Failed to delete chat" });
+//   }
+// });
 
 async function initializeRAG() {
   try {
