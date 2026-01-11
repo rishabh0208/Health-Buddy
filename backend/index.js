@@ -40,9 +40,7 @@ app.use(express.json());
 
 const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// New route to get chat history
-// server.js - Update the chat history endpoint
-
+//get chat history by chatId
 app.get("/chats/:chatId", async (req, res) => {
   try {
     const chat = await Chat.findById(req.params.chatId)
@@ -69,7 +67,7 @@ app.get("/chats/:chatId", async (req, res) => {
   }
 });
 
-// Add login route before /generate route
+// login 
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -94,7 +92,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Add this to server.js before the /generate route
+// create user  
 app.post("/users", async (req, res) => {
   try {
     const { name, age, email, password, menstruationCycleType } = req.body;
@@ -118,6 +116,8 @@ app.post("/users", async (req, res) => {
   }
 });
 
+
+// Get chats by userId
 app.get("/chats/user/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -135,6 +135,7 @@ app.get("/chats/user/:userId", async (req, res) => {
   }
 });
 
+// Get symptoms for a user with optional time filter
 app.get("/users/:userId/symptoms", async (req, res) => {
   try {
     const { filter } = req.query;
@@ -162,9 +163,8 @@ app.get("/users/:userId/symptoms", async (req, res) => {
   }
 });
 
-// Add this to server.js before other routes
-// Update the /users/:userId endpoint in server.js
-// Update the /users/:userId endpoint
+
+// get user info by userId
 app.get("/users/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId)
@@ -193,7 +193,7 @@ app.get("/users/:userId", async (req, res) => {
   }
 });
 
-// Add this endpoint before the /generate route
+// generate health summary for user
 app.get("/users/:userId/health-summary", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -234,7 +234,7 @@ app.get("/users/:userId/health-summary", async (req, res) => {
   }
 });
 
-// Add this endpoint to server.js
+// delete chat by chatId
 app.delete("/chats/:chatId", async (req, res) => {
   try {
     const { chatId } = req.params;
@@ -289,6 +289,7 @@ async function initializeRAG() {
   }
 }
 
+// generate response from Gemini with RAG and stores response from user and ai in chat history
 app.post("/generate", async (req, res) => {
   try {
     const { prompt, userId, chatId } = req.body;
@@ -372,11 +373,7 @@ app.post("/generate", async (req, res) => {
       if (vectorStore) {
         const results = await vectorStore.similaritySearch(prompt, 5);
         retrievedChunks = results.map((doc) => doc.pageContent);
-        console.log(
-          "Retrieved relevant context:",
-          retrievedChunks.length,
-          "chunks"
-        );
+        console.log("Retrieved relevant context:",retrievedChunks.length,"chunks");
       }
     } catch (error) {
       console.error("Error retrieving context:", error);
