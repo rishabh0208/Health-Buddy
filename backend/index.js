@@ -2,7 +2,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { GoogleGenAI } from "@google/genai";
 import mongoose from "mongoose";
 import User from "./models/User.js";
 import Chat from "./models/Chat.js";
@@ -14,6 +13,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import chatRoutes from "./routes/chat.js";
 import userRoutes from "./routes/user.js";
+import { generateGeminiResponse, generatePromptBasedResponse } from "./services/gemini.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,8 +40,6 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-
-const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 app.use("/chats", chatRoutes);
 app.use("/users", userRoutes);
@@ -318,11 +316,8 @@ app.post("/generate", async (req, res) => {
     // Create new chat if no chatId provided
     if (!chatId) {
       // Generate chat title using Gemini
-      const generateTitle = await genAI.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: `Generate a 1-3 word title for this health related query: ${prompt}. You can Output a maximum of 3 words and nothing else. NO EXPLANATION OR PREAMBLE IS NEEDED.`,
-      });
-      const title = generateTitle.text;
+      const titlePrompt = `Generate a concise and relevant title (1-3 words) for a health chat based on the following symptom: ${prompt}. Keep it under 3 words. No explanation needed.`;
+      const title = await generatePromptBasedResponse({prompt: titlePrompt});
 
       // Create new chat document
       chat = new Chat({
@@ -407,18 +402,7 @@ app.post("/generate", async (req, res) => {
       ? `${baseSystemMessage}\n\nRelevant Context:\n${context}`
       : baseSystemMessage;
 
-    // Generate AI response
-    const resp = genAI.chats.create({
-      model: "gemini-2.0-flash",
-      config: {
-        systemInstruction: systemMessage,
-      },
-      history: chat_history,
-    });
-
-    const response = await resp.sendMessageStream({
-      message: prompt,
-    });
+    const response = await generateGeminiResponse({ prompt, chatHistory: chat_history, systemMessage});
 
     // Set headers
     res.setHeader("Content-Type", "text/event-stream");

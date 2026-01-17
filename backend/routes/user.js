@@ -1,13 +1,9 @@
 import express from "express";
 import User from "../models/User.js";
 import Chat from "../models/Chat.js";
-import { GoogleGenAI } from "@google/genai";
+import { generatePromptBasedResponse } from "../services/gemini.js";
 
 const router = express.Router();
-
-const genAI = new GoogleGenAI({
-  apiKey: process.env.API_KEY,
-});
 
 // create user
 router.post("/", async (req, res) => {
@@ -98,10 +94,8 @@ router.get("/:userId/health-summary", async (req, res) => {
       )
     ).join("\n");
 
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: `Generate a concise health summary (max 150 words):\n${conversationHistory}`,
-    });
+    const summaryPrompt = `Based on the following conversation history, generate a concise health summary for the user. Use bullet points and clear headings. Avoid medical jargon. ${conversationHistory}`;
+    const response = await generatePromptBasedResponse({ summaryPrompt });
 
     res.json({ summary: response.text });
   } catch (error) {
