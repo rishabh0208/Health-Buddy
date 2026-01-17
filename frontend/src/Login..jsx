@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Heart } from "lucide-react";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
+
 
 export default function Login({ setCurrentUserId }) {
   const [formData, setFormData] = useState({
@@ -14,7 +16,7 @@ export default function Login({ setCurrentUserId }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://assignment-y3e0.onrender.com/login", {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

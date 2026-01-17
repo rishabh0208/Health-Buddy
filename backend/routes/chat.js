@@ -1,8 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const Chat = require("../models/Chat");
+import express from "express";
+import Chat from "../models/Chat.js";
+import User from "../models/User.js";
 
-//get chat history by chatId
+const router = express.Router();
+
+// get chat history by chatId
 router.get("/:chatId", async (req, res) => {
   try {
     const chat = await Chat.findById(req.params.chatId)
@@ -28,9 +30,7 @@ router.get("/:chatId", async (req, res) => {
   }
 });
 
-
-
-// Get chats by userId
+// get chats by userId
 router.get("/user/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -48,13 +48,11 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-
 // delete chat by chatId
 router.delete("/:chatId", async (req, res) => {
   try {
     const { chatId } = req.params;
 
-    // Find and delete the chat
     const result = await Chat.findByIdAndDelete(chatId);
 
     if (!result) {
@@ -68,4 +66,4 @@ router.delete("/:chatId", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

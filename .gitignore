@@ -2,3 +2,18 @@
 backend/faiss_index/faiss.index
 backend/models/Xenova/all-MiniLM-L6-v2/onnx/model.onnx
 backend/embeddings.json
+# Node.js
+node_modules/
+
+# Python virtual environments
+venv/
+.venv/
+
+# Environment files
+.env
+
+# Build outputs
+dist/
+build/
+
+.vscode/

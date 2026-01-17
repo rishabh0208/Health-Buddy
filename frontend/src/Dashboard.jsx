@@ -30,6 +30,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 
 function App({ currentUserId, setCurrentUserId }) {
   const [input, setInput] = useState("");
@@ -51,7 +52,7 @@ function App({ currentUserId, setCurrentUserId }) {
     }
 
     try {
-      const response = await fetch(`https://assignment-y3e0.onrender.com/chats/${chatId}`, {
+      const response = await fetch(`${API_BASE_URL}/chats/${chatId}`, {
         method: "DELETE",
       });
 
@@ -122,7 +123,7 @@ function App({ currentUserId, setCurrentUserId }) {
       if (!currentUserId) return;
       try {
         const response = await fetch(
-          `https://assignment-y3e0.onrender.com/users/${currentUserId}`
+          `${API_BASE_URL}/users/${currentUserId}`
         );
         const data = await response.json();
 
@@ -130,7 +131,7 @@ function App({ currentUserId, setCurrentUserId }) {
         if (!data.healthSummary) {
           try {
             const summaryResponse = await fetch(
-              `https://assignment-y3e0.onrender.com/users/${currentUserId}/health-summary`
+              `${API_BASE_URL}/users/${currentUserId}/health-summary`
             );
             const summaryData = await summaryResponse.json();
             data.healthSummary = summaryData.summary;
@@ -153,7 +154,7 @@ function App({ currentUserId, setCurrentUserId }) {
 
       try {
         const response = await fetch(
-          `https://assignment-y3e0.onrender.com/users/${currentUserId}/symptoms?filter=${timeFilter}`
+          `${API_BASE_URL}/users/${currentUserId}/symptoms?filter=${timeFilter}`
         );
         const data = await response.json();
 
@@ -178,7 +179,7 @@ function App({ currentUserId, setCurrentUserId }) {
     const loadUserChats = async () => {
       try {
         const response = await fetch(
-          `https://assignment-y3e0.onrender.com/chats/user/${currentUserId}`
+          `${API_BASE_URL}/chats/user/${currentUserId}`
         );
         const chats = await response.json();
         setChatHistory(chats);
@@ -224,7 +225,7 @@ function App({ currentUserId, setCurrentUserId }) {
     setResponse("");
 
     try {
-      const response = await fetch("https://assignment-y3e0.onrender.com/generate", {
+      const response = await fetch(`${API_BASE_URL}/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -323,7 +324,7 @@ function App({ currentUserId, setCurrentUserId }) {
 
   const loadChatHistory = async (chatId) => {
     try {
-      const response = await fetch(`https://assignment-y3e0.onrender.com/chats/${chatId}`);
+      const response = await fetch(`${API_BASE_URL}/chats/${chatId}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -12,6 +12,9 @@ import { pipeline } from "@xenova/transformers";
 import { env } from "@xenova/transformers";
 import path from "path";
 import { fileURLToPath } from "url";
+import chatRoutes from "./routes/chat.js";
+import userRoutes from "./routes/user.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,10 +42,6 @@ app.use(cors());
 app.use(express.json());
 
 const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-const chatRoutes = require("./routes/chat");
-const userRoutes = require("./routes/user");
-
 
 app.use("/chats", chatRoutes);
 app.use("/users", userRoutes);

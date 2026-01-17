@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Lock, Calendar, Heart, Info } from "lucide-react";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
+
 
 export default function Signup({ setCurrentUserId }) {
   const [formData, setFormData] = useState({
@@ -31,7 +33,7 @@ export default function Signup({ setCurrentUserId }) {
         return;
       }
 
-      const response = await fetch("https://assignment-y3e0.onrender.com/users", {
+      const response = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
