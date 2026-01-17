@@ -97,7 +97,7 @@ router.get("/:userId/health-summary", async (req, res) => {
     const summaryPrompt = `Based on the following conversation history, generate a concise health summary for the user. Use bullet points and clear headings. Avoid medical jargon. ${conversationHistory}`;
     const response = await generatePromptBasedResponse({ summaryPrompt });
 
-    res.json({ summary: response.text });
+    res.json({ summary: response });
   } catch (error) {
     res.status(500).json({ error: "Failed to generate health summary" });
   }
