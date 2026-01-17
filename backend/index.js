@@ -4,12 +4,18 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import path from "path";
+import { fileURLToPath } from "url";
+
 import chatRoutes from "./routes/chat.js";
 import userRoutes from "./routes/user.js";
 import loginRoutes from "./routes/login.js";
 import responseRoutes from "./routes/response.js";
+import { initializeRAG } from "./services/rag.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -26,6 +32,32 @@ app.use("/chats", chatRoutes);
 app.use("/users", userRoutes);
 app.use("/login", loginRoutes);
 app.use("/", responseRoutes);
+
+
+app.use(
+  "/assets",
+  express.static(path.join(__dirname, "client", "dist", "assets"), {
+    setHeaders(res, filePath) {
+      if (filePath.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css");
+      } else if (filePath.endsWith(".js")) {
+        res.setHeader("Content-Type", "application/javascript");
+      }
+    },
+  })
+);
+
+app.use(express.static(path.join(__dirname, "client", "dist")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+
+await initializeRAG();
+
+app.listen(port, () => {
+  console.log(`🚀 Server is running on port ${port}`);
+});
 
 // //get chat history by chatId
 // app.get("/chats/:chatId", async (req, res) => {
@@ -429,25 +461,3 @@ app.use("/", responseRoutes);
 // });
 
 
-
-
-app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    }
-  }
-}));
-
-app.use(express.static(path.join(__dirname,'client', 'dist')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname,'client','dist', 'index.html'));
-});
-
-await initializeRAG();
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});

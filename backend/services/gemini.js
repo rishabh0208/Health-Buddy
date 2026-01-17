@@ -33,6 +33,6 @@ export async function generatePromptBasedResponse({ prompt }) {
     contents: prompt,
   });
 
-  return response;
+  return response.text?.trim();
 }
 
